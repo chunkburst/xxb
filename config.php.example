@@ -1,0 +1,237 @@
+<?php
+
+// +----------------------------------------------------------------------
+// | Telegram ChatBot 全局配置文件
+// +----------------------------------------------------------------------
+
+// 严格类型模式
+declare(strict_types=1);
+
+return [
+    // ----------------
+    // Telegram Bot 设置
+    // ----------------
+    'telegram' => [
+        // 你的 Telegram Bot Token
+        'bot_token' => 'token',
+        
+        // 你的 Bot 的数字 ID (可选, 用于某些内部检查)
+        'bot_id' => 123456,
+        
+        // 你的 Bot 的用户名 (例如: @autoccb_chat_bot)
+        'bot_username' => '@autoccb_chat_bot',
+
+        // 仅允许机器人在这些群组ID中工作。留空数组表示允许所有群组。
+        // 例如: [-100123456789, -100987654321]
+        #'enabled_groups' => [-1002631151590],
+        'enabled_groups' => [],
+    
+        // 机器人的昵称，用于触发强制回复。请使用小写。
+        'bot_nicknames' => ['ccbot'],
+        
+        'worker_url_research' => '暂未实现的功能',
+        
+    ],
+
+    // ----------------
+    // AI 模型标签定义
+    // ----------------
+    'ai_labels' => [
+        //Kimi-K2 @ SiliconFlow
+        'kimi_k2' => [
+            'endpoint' => 'https://api.siliconflow.cn/v1/chat/completions',
+            'api_key' => 'sk-123456',
+            'model' => 'moonshotai/Kimi-K2-Instruct',
+        ],
+
+        //Gemini @ 随便填一个你喜欢的中转
+        'gemini' => [
+            'endpoint' => 'xxxxx',
+            'api_key' => 'sk-12323333',
+            'model' => 'gemini-3-flash-preview',
+        ],
+    ],
+
+   
+    // ----------------
+    // 功能配置
+    // ----------------
+    'ai_usage' => [
+        /**
+         * 这里有一个点需要说明
+         * 免费版CF有超市限制，所以如果你发现设置特别长的时间没用的话
+         * 可能是被CF给timeout了
+         */
+
+        // Judge功能 - 判断是否需要回复
+        'judge' => [
+            'label' => 'kimi_k2',         // 使用的标签
+            'backup' => 'kimi_k2',        // 备用标签
+            'timeout' => 60,              //超时设置
+        ],
+        
+        // Reply功能 - 生成回复
+        'reply' => [
+            'label' => 'kimi_k2',
+            'backup' => 'gemini',
+            'timeout' => 240,
+        ],
+        
+        // Reply Pro功能 - 更高级的回复
+        'reply_pro' => [
+            'label' => 'gemini',
+            'backup' => 'kimi_k2',
+            'timeout' => 500,
+        ],
+        
+        // Vision功能 - 图片识别
+        'vision' => [
+            'label' => 'kimi_k2',
+            'backup' => null,  // 暂无备用
+            'timeout' => 180,
+        ],
+        
+        // Summarize功能 - 知识总结
+        'summarize' => [
+            'label' => 'kimi_k2',
+            'backup' => 'kimi_k2',
+            'timeout' => 6000,
+        ],
+    ],
+
+    // ----------------
+    // 数据库设置
+    // ----------------
+    'database' => [
+        //驱动类型: 'file' (JSON文件) 或 'redis'
+        'driver' => 'file',
+        
+        //文件驱动设置
+        'file' => [
+            'storage_path' => __DIR__ . '/storage/context',
+        ],
+        
+        //Redis 驱动设置
+        'redis' => [
+            'host' => '127.0.0.1',
+            'port' => 6379,
+            'password' => null,
+            'database' => 0,
+        ],
+
+        //未部署的配置，无视即可
+        'say_hello_timing' => [
+            'min_cooldown' => 7200,  // 2小时
+            'max_cooldown' => 10800, // 3小时
+        ],
+
+    ],
+
+    // ----------------
+    // 上下文管理
+    // ----------------
+    'context' => [
+        //上下文最大长度 (条数)
+        'max_length' => 600,
+        
+        //上下文超出时，一次性清理的条数
+        'truncate_size' => 120,
+        
+        //Judge模型的上下文窗口大小（条数）
+        //只向Judge模型发送最近的N条消息，以加快判断速度
+        'judge_window_size' => 10,
+    ],
+
+    // ----------------
+    // 日志系统
+    // ----------------
+    'log' => [
+        // 是否启用日志
+        'enabled' => true,
+        // 日志文件存放目录
+        'log_directory' => __DIR__ . '/logs',
+        // 记录的最低日志级别 (DEBUG, INFO, WARNING, ERROR)
+        'level' => 'ERROR',
+    ],
+    
+    // ----------------
+    // 业务逻辑设置
+    // ----------------
+    'business' => [
+        // 机器人主人的用户ID，可以有特殊的人设(如果你不知道就不管这个)
+        'master_id' => 0,
+        
+        // 判定模型 (Judge) 是否接入知识库
+        'judge_uses_knowledge' => [
+            'enabled' => true,      // 主开关：为 false 则完全不使用任何知识库
+            'permanent' => true,    // 是否使用永久知识库 (permanent_knowledge.md)
+            'group' => false,        // 是否使用当前群聊的知识库
+        ],
+        
+        // 人设 prompt 文件的根目录
+        'persona_path' => __DIR__ . '/settings',
+        
+        // 默认的人设 prompt 文件名
+        'default_persona_file' => __DIR__ . '/prompt.txt',
+
+        'chat_configs' => [
+            '-114514' => [
+                'enable_cron_update' => true,    // 是否启用知识库定时更新
+                'enable_cron_report' => true,    // 是否启用定时报告
+                // 'models' => [                 // 可选：该群组的自定义模型
+                //     'judge' => 'gpt-4',
+                //     'reply' => 'claude-3-opus-20240229',
+                //     'reply_pro' => 'claude-3-opus-20240229',  // 专业回复模型
+                // ],
+            ],
+        ],
+        
+        // 在 cron_report.php 中，是否启用Token消耗估算功能。
+        // 启用后会加载上下文和提示词进行计算，对性能有轻微影响。
+        // 设置为 false 则只报告消息数量。
+        'cron_report_estimate_token' => false,
+    ],
+    
+    // ----------------
+    // 调试设置
+    // ----------------
+    'debug' => [
+        // 是否启用详细的时间追踪日志
+        // 启用后会记录各个步骤的耗时，用于性能分析
+        'time_count' => true,
+    ],
+    
+    // ----------------
+    // 异步任务 URL
+    // ----------------
+    'worker' => [
+        // request_chat.php 的可访问 URL
+        'url' => 'https://你部署的URL/request_chat.php',
+        
+        // request_curl.php 的可访问 URL
+        'curl_url' => 'https://你部署的URL/request_curl.php',
+    ],
+
+    // ----------------
+    // 路径设置
+    // ----------------
+    'paths' => [
+        // 模型能力缓存文件路径
+        'capability_cache' => __DIR__ . '/storage/cache/model_capabilities.json',
+        // 知识库文件存放目录 (仅当使用 file 驱动时有效)
+        'knowledge_base' => __DIR__ . '/storage/knowledge_base',
+        // 系统提示词 (judge.txt, say_hello.txt 等) 的存放目录
+        'system_prompt_path' => __DIR__ . '/system_prompt',
+    ],
+    
+    //不用管这个
+   'tools' => [],
+    
+    // ----------------
+    // 通用API密钥配置
+    // ----------------
+    'common_api_key' => 'sk-autoccb@autoccb', // <--- 用于timer等各种对接的通用API密钥
+    //可以暂时不管这个
+
+    
+];

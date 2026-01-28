@@ -1,0 +1,11 @@
+/logs/*
+!/logs/.gitkeep
+
+/storage/cache/*
+!/storage/cache/.gitkeep
+
+/storage/context/*
+!/storage/context/.gitkeep
+
+/storage/knowledge_base/*
+!/storage/knowledge_base/.gitkeep
