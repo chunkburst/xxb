@@ -82,3 +82,11 @@ cd /opt/xxb/ && php cron_long_term.php >> /dev/null 2>&1
 ## 📝 许可证
 
 本项目遵循 MIT 许可证。
+
+## 📦 Support
+
+请CCB喝杯咖啡！【支持：ETH链 / 币安链(BSC) / Poly链等】
+
+收款地址: `0x34ec2df7a44dfb252ed549a12b329eebfa016117`
+
+![usdt](https://crimson-rear-ladybug-723.mypinata.cloud/ipfs/bafkreig4bunhrakykko3bsjgnrnencxjvxsxv3r7bbtgfvtwvm4nbwware)
